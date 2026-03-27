@@ -2,7 +2,8 @@ import React from "react";
 import type { GetStaticProps } from "next";
 import Layout from "../components/Layout";
 import Post, { PostProps } from "../components/Post";
-import prisma from '../lib/prisma'
+import { prisma } from "../lib/prisma";
+
 
 export const getStaticProps: GetStaticProps = async () => {
   const feed = await prisma.post.findMany({
@@ -31,8 +32,14 @@ const Blog: React.FC<Props> = (props) => {
   return (
     <Layout>
       <div className="page">
-        <h1>Public Feed</h1>
+        <div className="page-header">
+          <h1>Feed</h1>
+          <p className="subtitle">Latest published posts</p>
+        </div>
         <main>
+          {props.feed.length === 0 && (
+            <div className="empty">No posts yet. Be the first to publish!</div>
+          )}
           {props.feed.map((post) => (
             <div key={post.id} className="post">
               <Post post={post} />
@@ -41,17 +48,34 @@ const Blog: React.FC<Props> = (props) => {
         </main>
       </div>
       <style jsx>{`
-        .post {
-          background: white;
-          transition: box-shadow 0.1s ease-in;
+        .page-header {
+          padding: 2.5rem 0 1.5rem;
         }
 
-        .post:hover {
-          box-shadow: 1px 1px 3px #aaa;
+        h1 {
+          margin: 0;
+          font-size: 1.75rem;
+          font-weight: 700;
+          letter-spacing: -0.03em;
+        }
+
+        .subtitle {
+          margin: 0.25rem 0 0;
+          color: var(--text-tertiary);
+          font-size: 0.9rem;
         }
 
         .post + .post {
-          margin-top: 2rem;
+          margin-top: 0.75rem;
+        }
+
+        .empty {
+          text-align: center;
+          padding: 3rem 1rem;
+          color: var(--text-tertiary);
+          font-size: 0.9rem;
+          border: 1px dashed var(--border);
+          border-radius: var(--radius);
         }
       `}</style>
     </Layout>
