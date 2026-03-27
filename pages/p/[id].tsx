@@ -1,5 +1,5 @@
 import React from "react";
-import type { GetStaticProps, GetStaticPaths } from "next";
+import type { GetServerSideProps } from "next";
 import ReactMarkdown from "react-markdown";
 import Layout from "../../components/Layout";
 import Router from "next/router";
@@ -7,7 +7,7 @@ import { PostProps } from "../../components/Post";
 import prisma from '../../lib/prisma'
 import { useSession } from "next-auth/react";
 
-export const getStaticProps: GetStaticProps = async ({ params }) => {
+export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const post = await prisma.post.findUnique({
     where: {
       id: String(params?.id),
@@ -20,7 +20,6 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   });
   return {
     props: post,
-    revalidate: 10,
   };
 };
 
@@ -38,13 +37,6 @@ async function deletePost(id: number): Promise<void> {
   });
   await Router.push("/")
 }
-
-export const getStaticPaths: GetStaticPaths = async () => {
-  return {
-    paths: [],
-    fallback: "blocking",
-  };
-};
 
 const Post: React.FC<PostProps> = (props) => {
   const { data: session, status } = useSession();
